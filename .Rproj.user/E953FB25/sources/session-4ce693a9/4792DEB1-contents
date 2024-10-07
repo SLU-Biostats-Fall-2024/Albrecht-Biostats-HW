@@ -1,0 +1,149 @@
+---
+title: "Homework 15"
+author: "Evelyn Albrecht"
+format: html
+editor: visual
+---
+
+# Chapter 3: Data Management, Manipulation, and Exploration with dplyr
+
+## working through chapter three of the class text "Getting Started With R" 
+
+This is Homework 15 for BIO303-Biostats
+
+Setting things up - clearing the environment and opening packages
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library("here")
+library(dplyr)
+library(ggplot2)
+```
+
+Introduction to the dplyr package - does various common data manipulations (ex. clac mean and stdev)
+
+Import data (fruit and grazing! yay!)
+
+```{r}
+read.csv(here("Data","compensation.csv"))
+```
+
+## 3.1 Summary statistics for each variable 
+want to get a feeling for what the data looks like in terms of rows and columns using glimpse
+```{r}
+compensation<- read.csv(here("Data","compensation.csv")) #assigning character
+glimpse(compensation) #take a peak
+#get summary stats for compensation variables 
+summary(compensation)
+```
+summary() gives us median, mean, interquartile range, minimum and maximum for all columns
+
+## 3.2 dplyr verbs
+there is a bunch of verb functions. I am going to transcribe them into my function spreadsheet
+REMEMBER THAT THE FIRST ARGUMENT TO ALL dplyr FUNCTIONS IS THE DATA FRAME
+
+## 3.3 Subsetting
+3.3.1
+grab a column 
+```{r}
+select(compensation, Fruit) #use the fruit column
+select(compensation, -Root) #selects every column except that which follows the "-"
+```
+3.3.2
+slice() - Grab rows
+```{r}
+slice(compensation, 2) # gives us second row
+slice(compensation, 2:10) #gives us rows 2 through 10
+slice(compensation, c(2,3,10)) #gives us multiple disconnected rows
+```
+3.3.3
+filter - 
+logical operators 
+```{r}
+with(compensation, Fruit>80)
+```
+using filter 
+```{r}
+filter(compensation, Fruit>80) #finds the rows where it is true that Fruit is >80 and returns them as a data frame 
+```
+Table 3.1 examples 
+```{r}
+filter(compensation, Fruit==80)
+filter(compensation, Fruit !=80)
+filter(compensation, Fruit <=80)
+filter(compensation, Fruit >80 | Fruit <20)
+filter(compensation, Fruit >80 & Fruit <20)
+```
+3.3.4
+make sure to assign names to the data frames you are making 
+```{r}
+lo_hi_fruit <- filter(compensation, Fruit >80 | Fruit <20)
+lo_hi_fruit
+```
+
+## 3.4 Transforming 
+3.4.1 
+mutate() makes new column out of info from data frame 
+head() limits the amount of rows we see
+```{r}
+head(compensation)
+compensation <- mutate(compensation, logfruit=log(Fruit)) #add new column 
+head(compensation)
+```
+
+## 3.5 Sorting 
+3.5.1
+arrange() putting observations into a certain order 
+```{r}
+arrange(compensation, Fruit) #arranges rows in terms of increasing fruit production
+```
+
+
+## 3.6 Mini-summary and two top tips 
+Top Tip 1: you can use more than one dpylr function at once 
+ex. 
+```{r}
+select(filter(compensation, Fruit >80), Root)
+```
+Top Tip 2: dpylr is magic 
+pipe -put the answer og the left hand command into the function on the right 
+
+```{r}
+#find root values from Fruit>80 subset using piping
+compensation %>%
+  filter(Fruit>80) %>% 
+  select(Root) 
+```
+
+## 3.7 Calculating summary statistics about groups of your data
+3.7.1 
+summarizing occurs in a series of steps 
+  1. Declare the Data Frame and what the grouping variable is
+  2. Provide some kind of math function with which to            summarize the data
+  3. Make a nice name for the values returned
+  4. Make R use all of this information 
+
+3.7.2
+Method 1: Nested approach - no piping
+```{r}
+summarise(group_by(compensation, Grazing),meanFruit = mean(Fruit))
+mean.fruit <-summarise(group_by(compensation, Grazing),meanFruit = mean(Fruit))
+```
+Method 2: Piping approach - no nesting
+```{r}
+compensation %>% 
+  group_by(Grazing) %>%
+  summarise(meanfruit=mean(Fruit))
+```
+3.7.4 
+you can group by any categorical variable and perform any summary statistics in doing this
+can also get more than on statistic at once 
+```{r}
+compensation %>%
+  group_by((Grazing)) %>% 
+  summarise(meanFruit=mean(Fruit), sdFruit=sd(Fruit))
+```
+
+## 3.8 What have you learned ... lots
+I have indeed learned a lot. 

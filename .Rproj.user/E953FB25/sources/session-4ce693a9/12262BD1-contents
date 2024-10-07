@@ -1,0 +1,14 @@
+---
+title: "hw15"
+format: html
+editor: visual
+---
+
+## Homework 15 feedback
+Nice work using heading levels to keep things looking nice in your document.
+
+In code block lines 20-21, you don't actually need those lines, beccause line 18 `library(tidyverse)` also loads the dplyr and ggplot2 packages.
+
+You did a nice job commenting your code within code chunks and also making some notes/jotting down what you are doing outside of code chunks.
+
+regarding line 159 - I'm glad!
